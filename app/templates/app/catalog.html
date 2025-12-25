@@ -1,0 +1,109 @@
+﻿{% extends "app/layout.html" %}
+{% load static %}
+
+{% block title %}Каталог товаров - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🛍️ Каталог товаров</h1>
+    <p class="lead">Уникальные сувениры и подарки для ваших близких</p>
+
+    {% if user.is_staff or user.is_superuser %}
+    <div class="text-center mb-4">
+        <a href="{% url 'create_product' %}" class="btn btn-success">
+            ➕ Добавить новый товар
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        {% if products %}
+        {% for product in products %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="product-card" style="background: #222; border-radius: 10px; overflow: hidden; border: 1px solid #333; height: 100%;">
+                <div class="product-image" style="height: 200px; overflow: hidden; position: relative;">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}"
+                         alt="{{ product.name }}"
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <div style="width: 100%; height: 100%; background: #8B0000; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                        📦
+                    </div>
+                    {% endif %}
+
+                    <div style="position: absolute; top: 10px; right: 10px; background: #8B0000; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">
+                        {{ product.price }} ₽
+                    </div>
+                </div>
+
+                <div class="product-info" style="padding: 20px;">
+                    <h3 style="color: #8B0000 !important; margin-top: 0; font-size: 1.3em; height: 60px; overflow: hidden;">
+                        {{ product.name }}
+                    </h3>
+
+                    {% if product.description %}
+                    <p style="color: #ccc; font-size: 0.9em; height: 40px; overflow: hidden;">
+                        {{ product.description|truncatechars:80 }}
+                    </p>
+                    {% endif %}
+
+                    <div class="product-actions" style="margin-top: 15px;">
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'add_to_cart' product.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                🛒 Добавить в корзину
+                            </button>
+                        </form>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'catalog' %}" class="btn btn-primary" style="width: 100%;">
+                            🔒 Войти для покупки
+                        </a>
+                        {% endif %}
+
+                        {% if user.is_staff or user.is_superuser %}
+                        <div class="admin-actions mt-2" style="display: flex; gap: 5px;">
+                            <a href="{% url 'edit_product' product.id %}" class="btn btn-warning btn-sm" style="flex: 1;">
+                                ✏️ Изменить
+                            </a>
+                            <a href="{% url 'delete_product' product.id %}" class="btn btn-danger btn-sm" style="flex: 1;">
+                                🗑️ Удалить
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-md-12 text-center py-5">
+            <div style="font-size: 48px; margin-bottom: 20px; color: #8B0000;">
+                🛒
+            </div>
+            <h3>Товаров пока нет</h3>
+            <p>Но скоро они появятся!</p>
+
+            {% if user.is_staff or user.is_superuser %}
+            <a href="{% url 'create_product' %}" class="btn btn-success btn-lg mt-3">
+                ➕ Добавить первый товар
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .product-card {
+        transition: all 0.3s ease;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 0, 0, 0.3);
+            border-color: #8B0000;
+        }
+</style>
+{% endblock %}

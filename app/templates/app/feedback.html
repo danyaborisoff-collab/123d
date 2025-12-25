@@ -1,0 +1,269 @@
+﻿
+{% extends "app/layout.html" %}
+
+{% block title %}Обратная связь - Avec Plaisir{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<div class="alert alert-warning">
+    <strong>Внимание!</strong> Для отправки отзыва необходимо
+    <a href="{% url 'login' %}">войти</a> или
+    <a href="{% url 'register' %}">зарегистрироваться</a>.
+</div>
+{% else %}
+<div class="feedback-page">
+    <h1>📝 Обратная связь</h1>
+    <p class="lead">Помогите нам стать лучше! Заполните форму ниже, чтобы поделиться вашим мнением о нашем сайте.</p>
+    <div class="row">
+        <div class="col-md-8">
+            <form method="post" class="feedback-form">
+                {% csrf_token %}
+
+                <div class="form-section">
+                    <h3>👤 Личная информация</h3>
+                    <div class="form-group">
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.name.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.email.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>⭐ Оценка сайта</h3>
+                    <div class="form-group">
+                        {{ form.overall_rating.label_tag }}
+                        <div class="rating-options">
+                            {% for choice in form.overall_rating %}
+                            <div class="radio-option">
+                                {{ choice.tag }}
+                                <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.liked_features.label_tag }}
+                        <div class="checkbox-options">
+                            {% for choice in form.liked_features %}
+                            <div class="checkbox-option">
+                                {{ choice.tag }}
+                                <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>📊 Дополнительная информация</h3>
+                    <div class="form-group">
+                        {{ form.visit_frequency.label_tag }}
+                        {{ form.visit_frequency }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.recommendation.label_tag }}
+                        <div class="slider-container">
+                            {{ form.recommendation }}
+                            <div class="slider-labels">
+                                <span>0 (Не порекомендую)</span>
+                                <span>10 (Обязательно порекомендую)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>💡 Ваши предложения</h3>
+                    <div class="form-group">
+                        {{ form.suggestions.label_tag }}
+                        {{ form.suggestions }}
+                        <small class="form-text text-muted">Максимум 1000 символов</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group agreement">
+                        <div class="checkbox-option">
+                            {{ form.agree_to_terms }}
+                            <label for="{{ form.agree_to_terms.id_for_label }}">
+                                {{ form.agree_to_terms.label }}
+                            </label>
+                        </div>
+                        {% if form.agree_to_terms.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.agree_to_terms.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        📤 Отправить отзыв
+                    </button>
+                    <button type="reset" class="btn btn-default">
+                        Очистить форму
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+            <div class="feedback-info">
+                <h3>ℹ️ Зачем мы собираем отзывы?</h3>
+                <ul>
+                    <li>Улучшаем удобство сайта</li>
+                    <li>Расширяем ассортимент товаров</li>
+                    <li>Делаем цены более доступными</li>
+                    <li>Улучшаем качество обслуживания</li>
+                    <li>Создаем новые полезные функции</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <strong>Спасибо за ваше время!</strong><br>
+                    Каждый отзыв помогает нам стать лучше.
+                </div>
+
+                <div class="contact-info-box">
+                    <h4>📞 Другие способы связи</h4>
+                    <p>Email: feedback@avecplaisir.ru</p>
+                    <p>Телефон: +7 (999) 123-45-67</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .feedback-page {
+        padding: 20px 0;
+    }
+
+    .form-section {
+        background: #222;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border: 1px solid #333;
+    }
+
+        .form-section h3 {
+            color: #8B0000;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+    .rating-options, .checkbox-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .radio-option, .checkbox-option {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background: #2a2a2a;
+        border-radius: 4px;
+        transition: background 0.3s;
+    }
+
+        .radio-option:hover, .checkbox-option:hover {
+            background: #333;
+        }
+
+        .radio-option input, .checkbox-option input {
+            margin-right: 10px;
+        }
+
+        .radio-option label, .checkbox-option label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+    .slider-container {
+        padding: 15px;
+        background: #2a2a2a;
+        border-radius: 8px;
+    }
+
+    .slider-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #aaa;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        background: #444;
+        outline: none;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #333;
+    }
+
+    .feedback-info {
+        background: #222;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #333;
+    }
+
+        .feedback-info ul {
+            padding-left: 20px;
+        }
+
+        .feedback-info li {
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+
+    .contact-info-box {
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 20px;
+    }
+
+    .agreement {
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 6px;
+    }
+
+    .alert-info {
+        background: #1a3a5f;
+        border-color: #2a4a6f;
+        color: #b3d9ff;
+    }
+</style>
+</div>
+{% endif %}
+{% endblock %}

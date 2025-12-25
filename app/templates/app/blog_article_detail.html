@@ -1,0 +1,509 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}{{ article.title }} - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="article-detail-container">
+    <div class="full-article">
+        <!-- Хлебные крошки -->
+        <div class="breadcrumb">
+            <a href="{% url 'blog_list' %}">📰 Блог</a> /
+            <span>Статья</span>
+        </div>
+
+        <!-- Заголовок статьи -->
+        <header class="article-header">
+            {% if article.image %}
+            <div class="article-image-section">
+                <img src="{{ article.image.url }}"
+                     alt="{{ article.title }}"
+                     class="article-main-image">
+                <p class="image-caption">Изображение к статье</p>
+            </div>
+
+            <style>
+                .article-image-section {
+                    margin: 30px 0;
+                    text-align: center;
+                }
+
+                .article-main-image {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    border: 1px solid #444;
+                }
+
+                .image-caption {
+                    color: #888;
+                    font-style: italic;
+                    margin-top: 10px;
+                    font-size: 0.9em;
+                }
+            </style>
+            {% endif %}
+            <h1 class="article-main-title">{{ article.title }}</h1>
+
+            <div class="article-meta-detail">
+                <div class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    <span class="meta-text">
+                        Опубликовано: {{ article.published_date|date:"d.m.Y H:i" }}
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">✏️</span>
+                    <span class="meta-text">
+                        Обновлено: {{ article.updated_at|date:"d.m.Y H:i" }}
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Краткое содержание -->
+        <div class="article-short-summary">
+            <div class="summary-box">
+                <h3><span class="summary-icon">📋</span> Краткое содержание:</h3>
+                <div class="summary-content">
+                    {{ article.short_content|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Полный текст статьи -->
+        <div class="article-content">
+            <h2><span class="content-icon">📖</span> Полный текст статьи:</h2>
+            <div class="content-text">
+                {{ article.full_content|linebreaks }}
+            </div>
+        </div>
+
+        <!-- ========== СЕКЦИЯ КОММЕНТАРИЕВ ========== -->
+        <div class="comments-section">
+            <h3 class="comments-title">
+                <span class="comment-icon">💬</span> Комментарии
+                {% if comments %}
+                <span class="comment-count">({{ comments|length }})</span>
+                {% else %}
+                <span class="comment-count">(0)</span>
+                {% endif %}
+            </h3>
+
+            <!-- Отображение сообщений Django -->
+            {% if messages %}
+            <div class="comment-messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Форма добавления комментария -->
+            {% if user.is_authenticated %}
+            <div class="add-comment-form">
+                <h4 class="form-title">Добавить комментарий:</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="text"
+                                  class="form-control comment-textarea"
+                                  rows="4"
+                                  placeholder="Напишите ваш комментарий здесь..."
+                                  required
+                                  minlength="3"></textarea>
+                        <small class="form-help">Минимум 3 символа</small>
+                    </div>
+                    <button type="submit" class="btn btn-comment-submit">
+                        <span class="submit-icon">📝</span> Опубликовать комментарий
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="comment-login-required">
+                <div class="login-alert">
+                    <span class="alert-icon">🔒</span>
+                    <div class="alert-content">
+                        <p><strong>Только авторизованные пользователи могут оставлять комментарии</strong></p>
+                        <p>
+                            Пожалуйста, <a href="{% url 'login' %}?next={{ request.path }}">войдите</a> или
+                            <a href="{% url 'register' %}">зарегистрируйтесь</a> чтобы добавить комментарий.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ===== СПИСОК КОММЕНТАРИЕВ ===== -->
+            <div class="comments-list">
+                {% if comments %}
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <div class="comment-header">
+                        <div class="comment-author-info">
+                            <span class="comment-author-icon">👤</span>
+                            <span class="comment-author-name">{{ comment.author.username }}</span>
+                            {% if comment.author.is_staff %}
+                            <span class="staff-badge">👑 Админ</span>
+                            {% endif %}
+                        </div>
+                        <div class="comment-date-info">
+                            <span class="comment-date-icon">📅</span>
+                            <span class="comment-date">{{ comment.created_date|date:"d.m.Y H:i" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="comment-body">
+                        <div class="comment-text">
+                            {{ comment.text|linebreaks }}
+                        </div>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    {% if user.is_staff or user.is_superuser or user == comment.author %}
+                    <div class="comment-actions">
+                        <form method="post" action="{% url 'delete_comment' comment.id %}"
+                              class="delete-comment-form"
+                              onsubmit="return confirm('Вы уверены, что хотите удалить этот комментарий?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-delete-comment">
+                                <span class="delete-icon">🗑️</span> Удалить
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="no-comments">
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <h4>Пока нет комментариев</h4>
+                        <p>Будьте первым, кто оставит комментарий к этой статье!</p>
+                        {% if not user.is_authenticated %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-login-to-comment">
+                            Войти для комментирования
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Футер статьи -->
+        <footer class="article-footer">
+            <!-- Навигация -->
+            <div class="article-navigation">
+                <a href="{% url 'blog_list' %}" class="back-to-list-btn">
+                    <span class="back-icon">←</span> Назад к списку статей
+                </a>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<style>
+    /* ОСНОВНЫЕ СТИЛИ */
+    .article-detail-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .full-article {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid #333;
+    }
+
+    /* Хлебные крошки */
+    .breadcrumb {
+        margin-bottom: 25px;
+        padding: 10px 15px;
+        background: #222;
+        border-radius: 6px;
+        border-left: 4px solid #8B0000;
+    }
+
+        .breadcrumb a {
+            color: #8B0000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+    /* Заголовок и метаданные */
+    .article-header {
+        margin-bottom: 30px;
+    }
+
+    .article-main-title {
+        color: #8B0000 !important;
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+
+    .article-meta-detail {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .meta-icon {
+        color: #8B0000;
+    }
+
+    .meta-text {
+        color: #ccc;
+    }
+
+    /* Краткое содержание */
+    .article-short-summary {
+        margin: 30px 0;
+        background: rgba(139, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 25px;
+    }
+
+    .summary-box h3 {
+        color: #8B0000 !important;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .summary-content {
+        color: #ddd;
+        line-height: 1.7;
+    }
+
+    /* Основной контент */
+    .article-content {
+        margin: 40px 0;
+    }
+
+        .article-content h2 {
+            color: #8B0000 !important;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .content-text {
+        color: #eee;
+        line-height: 1.8;
+        background: #222;
+        padding: 25px;
+        border-radius: 8px;
+        border-left: 4px solid #8B0000;
+    }
+
+    /* ========== СТИЛИ КОММЕНТАРИЕВ ========== */
+    .comments-section {
+        margin-top: 50px;
+        padding: 25px;
+        background: #222;
+        border-radius: 12px;
+        border-top: 5px solid #8B0000;
+    }
+
+    .comments-title {
+        color: #fff !important;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .comment-icon {
+        color: #8B0000;
+    }
+
+    .comment-count {
+        background: #8B0000;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8em;
+    }
+
+    /* Форма комментария */
+    .add-comment-form {
+        background: #1a1a1a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    .form-title {
+        color: #8B0000 !important;
+        margin-bottom: 15px;
+    }
+
+    .comment-textarea {
+        width: 100%;
+        background: #222 !important;
+        border: 1px solid #555 !important;
+        color: white !important;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 1em;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+        .comment-textarea:focus {
+            border-color: #8B0000 !important;
+        }
+
+    .form-help {
+        color: #888;
+        font-size: 0.9em;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .btn-comment-submit {
+        background: #8B0000;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+
+        .btn-comment-submit:hover {
+            background: #A52A2A;
+        }
+
+    /* Список комментариев */
+    .comments-list {
+        margin-top: 20px;
+    }
+
+    .comment-item {
+        background: #1a1a1a;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #8B0000;
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #333;
+    }
+
+    .comment-author-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .comment-author-name {
+        color: #8B0000;
+        font-weight: bold;
+    }
+
+    .staff-badge {
+        background: #8B0000;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8em;
+    }
+
+    .comment-date {
+        color: #aaa;
+        font-size: 0.9em;
+    }
+
+    .comment-text {
+        color: #eee;
+        line-height: 1.6;
+    }
+
+    /* Кнопки удаления */
+    .comment-actions {
+        margin-top: 10px;
+        text-align: right;
+    }
+
+    .btn-delete-comment {
+        background: #dc3545;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+
+        .btn-delete-comment:hover {
+            background: #c82333;
+        }
+
+    /* Нет комментариев */
+    .no-comments {
+        text-align: center;
+        padding: 30px;
+    }
+
+    .empty-icon {
+        font-size: 2em;
+        color: #8B0000;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .empty-state h4 {
+        color: #8B0000 !important;
+        margin-bottom: 10px;
+    }
+
+    .btn-login-to-comment {
+        background: #8B0000;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 10px;
+    }
+
+    /* Кнопка назад */
+    .back-to-list-btn {
+        background: #333;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+        .back-to-list-btn:hover {
+            background: #444;
+            color: white;
+        }
+</style>
+{% endblock %}

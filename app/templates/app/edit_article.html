@@ -1,0 +1,145 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Редактирование статьи - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="edit-article-container">
+    <h1 class="edit-article-title">
+        {% if article.id %}✏️ Редактирование статьи{% else %}➕ Создание новой статьи{% endif %}
+    </h1>
+
+    <div class="edit-article-form">
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Поле заголовка -->
+            <div class="form-group">
+                <label class="form-label" for="title">Заголовок статьи *</label>
+                <input type="text"
+                       id="title"
+                       name="title"
+                       class="form-text-input"
+                       value="{{ article.title|default:'' }}"
+                       required
+                       placeholder="Введите заголовок статьи">
+                {% if errors.title %}
+                <div class="error-message">{{ errors.title }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Поле краткого содержания -->
+            <div class="form-group">
+                <label class="form-label" for="short_content">Краткое содержание *</label>
+                <textarea id="short_content"
+                          name="short_content"
+                          class="form-textarea"
+                          rows="4"
+                          required
+                          placeholder="Введите краткое содержание статьи (максимум 500 символов)">{{ article.short_content|default:'' }}</textarea>
+                <div class="form-hint">Максимум 500 символов. Будет отображаться в списке статей.</div>
+                {% if errors.short_content %}
+                <div class="error-message">{{ errors.short_content }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Поле полного содержания -->
+            <div class="form-group">
+                <label class="form-label" for="full_content">Полное содержание *</label>
+                <textarea id="full_content"
+                          name="full_content"
+                          class="form-textarea"
+                          rows="12"
+                          required
+                          placeholder="Введите полный текст статьи">{{ article.full_content|default:'' }}</textarea>
+                <div class="form-hint">Поддерживается HTML-разметка для форматирования.</div>
+                {% if errors.full_content %}
+                <div class="error-message">{{ errors.full_content }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Поле даты публикации -->
+            <div class="form-group">
+                <label class="form-label" for="published_date">Дата публикации</label>
+                <input type="datetime-local"
+                       id="published_date"
+                       name="published_date"
+                       class="form-date-input"
+                       value="{{ article.published_date|date:'Y-m-d\TH:i'|default:'' }}"
+                       placeholder="Выберите дату и время публикации">
+                <div class="form-hint">
+                    Оставьте пустым для сохранения как черновик.
+                    Установите будущую дату для запланированной публикации.
+                </div>
+                {% if errors.published_date %}
+                <div class="error-message">{{ errors.published_date }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Блок предпросмотра (опционально) -->
+            {% if article.title or article.short_content %}
+            <div class="preview-section">
+                <h3 class="preview-title">👁️ Предпросмотр</h3>
+                <div class="preview-content">
+                    <strong>Заголовок:</strong> {{ article.title|default:'Нет заголовка' }}<br>
+                    <strong>Краткое содержание:</strong><br>
+                    {{ article.short_content|default:'Нет содержания'|truncatechars:100 }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Кнопки действий -->
+            <div class="form-buttons">
+                <button type="submit" class="save-btn">
+                    {% if article.id %}💾 Сохранить изменения{% else %}➕ Создать статью{% endif %}
+                </button>
+                <a href="{% if article.id %}{% url 'blog_article_detail' article.id %}{% else %}{% url 'blog_list' %}{% endif %}"
+                   class="cancel-btn">
+                    ❌ Отмена
+                </a>
+            </div>
+
+            <!-- Индикатор загрузки -->
+            <div class="loading-indicator">
+                <div style="color: #8B0000; font-size: 1.2rem;">
+                    ⏳ Сохранение...
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Подсчет символов для краткого содержания
+document.getElementById('short_content').addEventListener('input', function() {
+    const maxLength = 500;
+    const currentLength = this.value.length;
+    const counter = document.getElementById('short_content_counter') ||
+                    (function() {
+                        const div = document.createElement('div');
+                        div.id = 'short_content_counter';
+                        div.className = 'form-hint';
+                        this.parentNode.appendChild(div);
+                        return div;
+                    }).call(this);
+
+    counter.textContent = `Символов: ${currentLength}/${maxLength}`;
+
+    if (currentLength > maxLength) {
+        counter.style.color = '#dc3545';
+        counter.innerHTML += ' ⚠️ Превышен лимит!';
+    } else if (currentLength > maxLength * 0.9) {
+        counter.style.color = '#ffc107';
+    } else {
+        counter.style.color = '#888';
+    }
+});
+
+// Автоподсчет символов при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    const shortContent = document.getElementById('short_content');
+    if (shortContent) {
+        shortContent.dispatchEvent(new Event('input'));
+    }
+});
+</script>
+{% endblock %}

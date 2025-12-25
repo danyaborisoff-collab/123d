@@ -1,0 +1,17 @@
+﻿{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+    <h3 style="margin-top: 0;">Действия с блогом:</h3>
+    <div style="display: flex; gap: 10px;">
+        <a href="/admin/app/blogarticle/add/" class="button" style="background-color: #28a745; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+            ➕ Добавить статью
+        </a>
+        <a href="{% url 'blog_list' %}" target="_blank" class="button" style="background-color: #8B0000; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+            📖 Просмотреть на сайте
+        </a>
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

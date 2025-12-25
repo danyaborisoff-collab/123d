@@ -1,0 +1,29 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Удаление комментария - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Удаление комментария</h1>
+
+    <div class="alert alert-danger">
+        <h3>Вы уверены, что хотите удалить этот комментарий?</h3>
+        <p><strong>Автор:</strong> {{ comment.author.username }}</p>
+        <p><strong>Дата:</strong> {{ comment.created_date|date:"d.m.Y H:i" }}</p>
+        <p><strong>Текст:</strong></p>
+        <div class="well" style="background-color: #222; padding: 15px; border-radius: 5px;">
+            {{ comment.text|linebreaks }}
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-danger">🗑️ Да, удалить</button>
+            <a href="{% url 'blog_article_detail' comment.post.id %}" class="btn btn-default">
+                ❌ Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

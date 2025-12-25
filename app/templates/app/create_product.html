@@ -1,0 +1,143 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}{{ title }} - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="form-card" style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #333;">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">{{ form.name.label }} *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-danger">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        <small class="form-text text-muted">Описание товара (необязательно)</small>
+                        {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.price.id_for_label }}">{{ form.price.label }} *</label>
+                        {{ form.price }}
+                        <small class="form-text text-muted">Цена в рублях</small>
+                        {% if form.price.errors %}
+                        <div class="text-danger">{{ form.price.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.category.id_for_label }}">{{ form.category.label }} *</label>
+                        {{ form.category }}
+                        <small class="form-text text-muted">Например: сувениры, аксессуары, подарки</small>
+                        {% if form.category.errors %}
+                        <div class="text-danger">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                        <div class="custom-file">
+                            {{ form.image }}
+                            <label class="custom-file-label" for="{{ form.image.id_for_label }}">
+                                {% if product and product.image %}
+                                Текущее: {{ product.image.name|slice:"9:" }}
+                                {% else %}
+                                Выберите файл...
+                                {% endif %}
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            Рекомендуемый размер: 600×600 пикселей. Поддерживаемые форматы: JPG, PNG, GIF.
+                        </small>
+                        {% if form.image.errors %}
+                        <div class="text-danger">{{ form.image.errors }}</div>
+                        {% endif %}
+
+                        {% if product and product.image %}
+                        <div class="mt-2">
+                            <p><strong>Текущее изображение:</strong></p>
+                            <img src="{{ product.image.url }}"
+                                 alt="{{ product.name }}"
+                                 class="img-thumbnail"
+                                 style="max-width: 200px;">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">
+                            {% if product %}Сохранить изменения{% else %}Создать товар{% endif %}
+                        </button>
+                        <a href="{% url 'catalog' %}" class="btn btn-secondary">
+                            Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            {% if product %}
+            <div class="card mt-4" style="background: #222; border-color: #8B0000;">
+                <div class="card-header" style="background: #333; border-color: #8B0000;">
+                    <h5>⚠️ Опасные действия</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'delete_product' product.id %}"
+                       class="btn btn-danger btn-block"
+                       onclick="return confirm('Удалить товар {{ product.name }}? Это действие нельзя отменить!')">
+                        🗑️ Удалить товар
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-file-label::after {
+        content: "Обзор";
+    }
+
+    .form-control, .custom-file-input {
+        background-color: #333;
+        border: 1px solid #555;
+        color: white;
+    }
+
+        .form-control:focus {
+            background-color: #444;
+            border-color: #8B0000;
+            color: white;
+        }
+
+    .custom-file-label {
+        background-color: #333;
+        border: 1px solid #555;
+        color: #aaa;
+    }
+</style>
+
+<script>
+    // Показываем имя выбранного файла
+    document.querySelector('.custom-file-input')?.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            var fileName = this.files[0].name;
+            var nextSibling = e.target.nextElementSibling;
+            nextSibling.innerText = fileName;
+        }
+    });
+</script>
+{% endblock %}

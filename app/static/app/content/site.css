@@ -1,0 +1,86 @@
+﻿body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 70px;
+    margin: 0;
+}
+
+/* Основной белый контейнер */
+.container.body-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    margin-top: 20px;
+    margin-bottom: 30px;
+    min-height: 500px;
+}
+
+/* Навигация */
+.navbar {
+    background: white !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1) !important;
+    border: none !important;
+}
+
+.navbar-brand {
+    color: #e63946 !important;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+    .navbar-brand img {
+        height: 40px;
+        margin-right: 10px;
+        border-radius: 4px;
+    }
+
+.navbar-nav > li > a {
+    color: #333 !important;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+    .navbar-nav > li > a:hover {
+        color: #e63946 !important;
+        background: #f8f9fa !important;
+    }
+
+/* Jumbotron */
+.jumbotron {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+    color: white !important;
+    border-radius: 10px;
+    padding: 40px !important;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+    .jumbotron h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+
+/* Кнопки */
+.btn-primary {
+    background-color: #e63946 !important;
+    border-color: #e63946 !important;
+}
+
+    .btn-primary:hover {
+        background-color: #d32f3c !important;
+        border-color: #d32f3c !important;
+    }
+
+/* Подвал */
+footer {
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #666;
+    text-align: center;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 8px;
+}

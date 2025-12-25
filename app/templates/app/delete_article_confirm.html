@@ -1,0 +1,164 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Удаление статьи - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="delete-confirmation-page">
+    <div class="confirmation-card">
+        <div class="confirmation-header">
+            <h1>🗑️ Подтверждение удаления статьи</h1>
+            <div class="warning-icon">⚠️</div>
+        </div>
+
+        <div class="confirmation-content">
+            <div class="alert alert-danger">
+                <h4>Внимание! Это действие нельзя отменить.</h4>
+                <p>Вы собираетесь удалить статью. После удаления она будет полностью удалена из базы данных.</p>
+            </div>
+
+            <div class="article-preview">
+                <h3>Статья для удаления:</h3>
+                <div class="preview-card">
+                    <div class="preview-header">
+                        <strong>Заголовок:</strong> {{ article.title }}
+                    </div>
+                    <div class="preview-body">
+                        <p><strong>Краткое содержание:</strong> {{ article.short_content|truncatechars:100 }}</p>
+                        <p>
+                            <strong>Дата публикации:</strong>
+                            {% if article.published_date %}
+                            {{ article.published_date|date:"d.m.Y H:i" }}
+                            {% else %}
+                            Черновик
+                            {% endif %}
+                        </p>
+                        <p><strong>Дата создания:</strong> {{ article.created_at|date:"d.m.Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="confirmation-actions">
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        🗑️ Да, удалить эту статью
+                    </button>
+                    <a href="{% url 'blog_article_detail' article.id %}" class="btn btn-default btn-lg">
+                        ❌ Отмена
+                    </a>
+                </form>
+            </div>
+
+            <div class="confirmation-footer">
+                <p><small>Только администраторы могут удалять статьи.</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .delete-confirmation-page {
+        padding: 30px 0;
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .confirmation-card {
+        background: #222;
+        padding: 30px;
+        border-radius: 10px;
+        border: 2px solid #dc3545;
+        max-width: 600px;
+        width: 100%;
+        box-shadow: 0 5px 20px rgba(220, 53, 69, 0.2);
+    }
+
+    .confirmation-header {
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #444;
+        padding-bottom: 15px;
+    }
+
+        .confirmation-header h1 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+
+    .warning-icon {
+        font-size: 60px;
+        margin-top: 10px;
+    }
+
+    .alert-danger {
+        background-color: #442222;
+        border-color: #8B0000;
+        color: #ffcccc;
+        padding: 15px;
+        border-radius: 6px;
+    }
+
+    .article-preview {
+        margin: 25px 0;
+    }
+
+    .preview-card {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 6px;
+        border: 1px solid #444;
+        margin-top: 10px;
+    }
+
+    .preview-header {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #333;
+    }
+
+    .preview-body p {
+        margin: 8px 0;
+        color: #ddd;
+    }
+
+    .confirmation-actions {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+        .confirmation-actions form {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+    .btn-danger {
+        background: linear-gradient(to right, #dc3545, #c82333);
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1em;
+    }
+
+        .btn-danger:hover {
+            background: linear-gradient(to right, #c82333, #bd2130);
+        }
+
+    .btn-default {
+        background: #6c757d;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1em;
+    }
+
+    .confirmation-footer {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid #333;
+        text-align: center;
+        color: #aaa;
+    }
+</style>
+{% endblock %}

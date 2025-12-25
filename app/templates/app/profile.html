@@ -1,0 +1,177 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Профиль - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <h1>👤 Личный кабинет</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <h3>{{ user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+
+                <div class="profile-info">
+                    <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+                    <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i"|default:"Еще не входил" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="profile-stats">
+                <h3>📊 Ваша активность</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ total_feedbacks }}</div>
+                        <div class="stat-label">Отзывов оставлено</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Заказов</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Избранных товаров</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if feedbacks %}
+            <div class="recent-feedbacks">
+                <h3>📝 Последние отзывы</h3>
+                {% for feedback in feedbacks|slice:":3" %}
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <span class="feedback-date">{{ feedback.created_at|date:"d.m.Y" }}</span>
+                        <span class="feedback-rating">{{ feedback.overall_rating }}</span>
+                    </div>
+                    <p class="feedback-text">{{ feedback.suggestions|truncatechars:100|default:"Без комментариев" }}</p>
+                </div>
+                {% endfor %}
+                <a href="{% url 'my_feedbacks' %}" class="btn btn-default btn-block">Все мои отзывы</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-page {
+        padding: 20px 0;
+    }
+
+    .profile-card {
+        background: #222;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid #333;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: #8B0000;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        margin: 0 auto 20px;
+    }
+
+    .profile-info {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+        .profile-info p {
+            margin: 10px 0;
+            color: #ddd;
+        }
+
+        .profile-info strong {
+            color: #8B0000;
+            min-width: 150px;
+            display: inline-block;
+        }
+
+    .profile-stats {
+        background: #222;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #333;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .stat-item {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #444;
+    }
+
+        .stat-item .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8B0000;
+            margin-bottom: 5px;
+        }
+
+        .stat-item .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+    .recent-feedbacks {
+        background: #222;
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
+
+    .feedback-item {
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        border: 1px solid #333;
+    }
+
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .feedback-date {
+        color: #aaa;
+        font-size: 0.9em;
+    }
+
+    .feedback-rating {
+        color: #ffd700;
+        font-weight: bold;
+    }
+
+    .feedback-text {
+        color: #ddd;
+        margin: 0;
+    }
+</style>
+{% endblock %}

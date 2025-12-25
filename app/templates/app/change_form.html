@@ -1,0 +1,14 @@
+﻿{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block after_field_sets %}
+<div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+    <h3>Быстрые действия</h3>
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <a href="/admin/app/blogarticle/" class="button" style="background: #6c757d; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none;">
+            ← К списку статей
+        </a>
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

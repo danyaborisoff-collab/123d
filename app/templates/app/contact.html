@@ -1,0 +1,52 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Контакты - Avec Plaisir{% endblock %}
+
+{% block content %}
+<h2>Свяжитесь с нами</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Контактная информация</h3>
+        <address>
+            <strong>Avec Plaisir - Сувенирный магазин</strong><br />
+            г. Москва, ул. Примерная, д. 10<br />
+            Метро: Центральная<br />
+            <abbr title="Телефон">Тел:</abbr> +7 (999) 123-45-67
+        </address>
+
+        <address>
+            <strong>Электронная почта</strong><br />
+            <a href="mailto:info@avecplaisir.ru">info@avecplaisir.ru</a><br />
+            <a href="mailto:orders@avecplaisir.ru">orders@avecplaisir.ru</a>
+        </address>
+
+        <h4>Часы работы</h4>
+        <ul>
+            <li>Понедельник - Пятница: 9:00-20:00</li>
+            <li>Суббота: 10:00-18:00</li>
+            <li>Воскресенье: 10:00-16:00</li>
+        </ul>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Форма обратной связи</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Ваше имя *</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email адрес *</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Сообщение *</label>
+                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить сообщение</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+﻿{% extends "app/layout.html" %}
+{% load static %}
+
+{% block title %}Корзина - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🛒 Моя корзина</h1>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="cart-items">
+                {% for item in cart_items %}
+                <div class="cart-item mb-3" style="background: #222; border-radius: 8px; padding: 15px; border: 1px solid #333;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}"
+                                 alt="{{ item.product.name }}"
+                                 style="width: 100%; border-radius: 5px;">
+                            {% else %}
+                            <div style="width: 100%; aspect-ratio: 1/1; background: #8B0000; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                                📦
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <h4 style="color: #8B0000 !important; margin-top: 0;">
+                                {{ item.product.name }}
+                            </h4>
+                            <p style="color: #ccc; margin-bottom: 10px;">
+                                {{ item.product.price }} ₽ × {{ item.quantity }} =
+                                <strong style="color: white;">{{ item.item_price }} ₽</strong>
+                            </p>
+
+                            <form method="post" action="{% url 'update_cart_item' item.id %}" class="form-inline">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label style="color: #ccc; margin-right: 10px;">Количество:</label>
+                                    <input type="number" name="quantity" value="{{ item.quantity }}"
+                                           min="1" max="99"
+                                           style="width: 70px; background: #333; border: 1px solid #555; color: white; padding: 5px; border-radius: 4px;">
+                                    <button type="submit" class="btn btn-sm btn-info" style="margin-left: 10px;">
+                                        Обновить
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-md-3 text-right">
+                            <a href="{% url 'remove_from_cart' item.id %}"
+                               class="btn btn-danger"
+                               onclick="return confirm('Удалить товар из корзины?')">
+                                🗑️ Удалить
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="cart-actions mt-4">
+                <a href="{% url 'clear_cart' %}"
+                   class="btn btn-danger"
+                   onclick="return confirm('Очистить всю корзину?')">
+                    🗑️ Очистить корзину
+                </a>
+                <a href="{% url 'catalog' %}" class="btn btn-default">
+                    ← Продолжить покупки
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="cart-summary" style="background: #222; border-radius: 8px; padding: 20px; border: 1px solid #8B0000;">
+                <h3 style="color: #8B0000 !important; margin-top: 0;">Итого</h3>
+
+                <div class="summary-details" style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #ccc;">Товаров:</span>
+                        <span style="color: white;">{{ cart_items|length }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #ccc;">Общая стоимость:</span>
+                        <span style="color: white; font-size: 1.2em; font-weight: bold;">
+                            {{ total_price }} ₽
+                        </span>
+                    </div>
+                </div>
+
+                {% if cart_items %}
+                <button class="btn btn-success btn-lg" style="width: 100%;" disabled>
+                    ⚠️ Оплата временно недоступна
+                </button>
+                <p style="color: #aaa; font-size: 0.9em; text-align: center; margin-top: 10px;">
+                    Функция оплаты будет доступна в следующем обновлении
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div style="font-size: 72px; color: #8B0000; margin-bottom: 20px;">
+            🛒
+        </div>
+        <h3>Корзина пуста</h3>
+        <p>Добавьте товары в корзину, чтобы увидеть их здесь</p>
+        <a href="{% url 'catalog' %}" class="btn btn-primary btn-lg mt-3">
+            🛍️ Перейти в каталог
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

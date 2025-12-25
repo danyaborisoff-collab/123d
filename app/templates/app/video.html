@@ -1,0 +1,147 @@
+﻿{% extends "app/layout.html" %}
+{% load static %}
+
+{% block title %}Видео - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🎬 Видео-галерея</h1>
+    <p class="lead">Посмотрите наши видео о сувенирах и культуре дарения</p>
+
+    <div class="row">
+        <!-- Видео 1 -->
+        <div class="col-md-6">
+            <div class="video-card">
+                <div class="video-header">
+                    <h3>🎁 Искусство выбора подарков</h3>
+                    <span class="video-duration">⏱️ 25 секунд</span>
+                </div>
+
+                <div class="video-container">
+                    <video controls width="100%">
+                        <!-- ИЗМЕНЕНИЕ ЗДЕСЬ: убрал poster, упростил путь -->
+                        <source src="{% static 'media/videos/art_of_gifting.mp4' %}" type="video/mp4">
+                        Ваш браузер не поддерживает видео тег.
+                    </video>
+                </div>
+
+                <div class="video-description">
+                    <p> Наша поездка на фестиваль! </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Видео 2 -->
+        <div class="col-md-6">
+            <div class="video-card">
+                <div class="video-header">
+                    <h3>Пополнение!</h3>
+                    <span class="video-duration">⏱️ 7 секунд</span>
+                </div>
+
+                <div class="video-container">
+                    <video controls width="100%">
+                        <!-- ИЗМЕНЕНИЕ ЗДЕСЬ: убрал poster, упростил путь -->
+                        <source src="{% static 'media/videos/french_souvenirs.mp4' %}" type="video/mp4">
+                        Ваш браузер не поддерживает видео тег.
+                    </video>
+                </div>
+
+                <div class="video-description">
+                    <p>Новые кружки с Довлатовым уже в коллекции!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-info mt-4">
+        <div class="alert alert-info">
+            <h4>📋 Информация о видео:</h4>
+            <ul>
+                <li>Формат: MP4 (H.264 кодек)</li>
+                <li>Максимальная длительность: 1 минута</li>
+                <li>Разрешение: 1280×720 (HD)</li>
+                <li>Для воспроизведения нажмите кнопку play</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .video-card {
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #333;
+        transition: transform 0.3s ease;
+    }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            border-color: #8B0000;
+        }
+
+    .video-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #8B0000;
+    }
+
+        .video-header h3 {
+            color: #8B0000 !important;
+            margin: 0;
+            font-size: 1.3em;
+        }
+
+    .video-duration {
+        background: #8B0000;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.9em;
+    }
+
+    .video-container {
+        margin-bottom: 15px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    video {
+        display: block;
+        background: #000;
+        border-radius: 6px;
+    }
+
+    .video-description {
+        color: #ccc;
+        font-size: 0.95em;
+        line-height: 1.5;
+    }
+
+    .video-info .alert {
+        background: rgba(139, 0, 0, 0.1);
+        border-color: #8B0000;
+        color: #ddd;
+    }
+
+    .video-info ul {
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+        .video-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .video-duration {
+            margin-top: 5px;
+        }
+    }
+</style>
+{% endblock %}

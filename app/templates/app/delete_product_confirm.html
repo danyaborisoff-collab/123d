@@ -1,0 +1,43 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Удаление товара - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="alert alert-danger" style="background: #8B0000; color: white; border-color: #660000;">
+                <h2 style="color: white !important; margin-top: 0;">⚠️ Удаление товара</h2>
+
+                <p>Вы уверены, что хотите удалить товар <strong>"{{ product.name }}"</strong>?</p>
+                <p>Цена: <strong>{{ product.price }} руб.</strong></p>
+
+                {% if product.image %}
+                <div class="text-center my-3">
+                    <img src="{{ product.image.url }}"
+                         alt="{{ product.name }}"
+                         class="img-thumbnail"
+                         style="max-width: 200px;">
+                </div>
+                {% endif %}
+
+                <p class="text-warning">
+                    <strong>Внимание!</strong> Это действие нельзя отменить. Все данные о товаре будут удалены безвозвратно.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            🗑️ Да, удалить товар
+                        </button>
+                        <a href="{% url 'catalog' %}" class="btn btn-default btn-lg">
+                            ↩️ Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

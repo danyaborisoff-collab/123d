@@ -1,0 +1,166 @@
+﻿{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #8B0000;">
+    <h3 style="margin-top: 0; color: #8B0000;">🚀 Быстрые действия:</h3>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <!-- Кнопка на сайт -->
+        <a href="{% url 'feedback_list' %}" target="_blank"
+           style="background-color: #8B0000; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+            🌐 Все отзывы на сайте
+        </a>
+
+        <!-- Кнопка на главную -->
+        <a href="{% url 'home' %}" target="_blank"
+           style="background-color: #28a745; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none;">
+            🏠 На главную
+        </a>
+
+        <!-- Кнопка выбора всех -->
+        <button type="button" onclick="selectAllFeedbacks()"
+                style="background-color: #17a2b8; color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; border: none; cursor: pointer;">
+            📋 Выбрать все
+        </button>
+
+        <!-- Кнопка быстрого удаления -->
+        <button type="button" onclick="deleteSelectedFeedbacks()"
+                style="background-color: #dc3545; color: white; padding: 10px 15px; border-radius: 4px; border: none; cursor: pointer;">
+            🗑️ Удалить выбранные
+        </button>
+
+        <!-- Форма для массового удаления -->
+        <form method="post" action="" id="bulk-delete-form" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete_selected_feedbacks">
+            <input type="hidden" name="select_across" value="0">
+        </form>
+    </div>
+</div>
+
+{{ block.super }}
+
+<script>
+// Функция для выбора всех отзывов
+function selectAllFeedbacks() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"].action-select');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = !allChecked;
+    });
+
+    updateSelectionCounter();
+}
+
+// Функция для удаления выбранных отзывов
+function deleteSelectedFeedbacks() {
+    const selected = document.querySelectorAll('input[type="checkbox"].action-select:checked');
+    const selectedCount = selected.length;
+
+    if (selectedCount === 0) {
+        alert('❌ Сначала выберите отзывы для удаления!');
+        return;
+    }
+
+    if (confirm(`🗑️ Удалить ${selectedCount} выбранных отзывов?`)) {
+        // Устанавливаем action
+        const actionSelect = document.querySelector('select[name="action"]');
+        if (actionSelect) {
+            actionSelect.value = 'delete_selected_feedbacks';
+        }
+
+        // Отправляем форму
+        document.getElementById('changelist-form').submit();
+    }
+}
+
+// Функция для подсчета выбранных элементов
+function updateSelectionCounter() {
+    const selected = document.querySelectorAll('input[type="checkbox"].action-select:checked');
+    const counter = document.getElementById('selection-counter');
+
+    if (selected.length > 0) {
+        if (!counter) {
+            const div = document.createElement('div');
+            div.id = 'selection-counter';
+            div.style.cssText = 'background: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; margin-left: 10px;';
+            document.querySelector('.actions').appendChild(div);
+        }
+        document.getElementById('selection-counter').textContent = `Выбрано: ${selected.length}`;
+    } else if (counter) {
+        counter.remove();
+    }
+}
+
+// Добавляем обработчики событий
+document.addEventListener('DOMContentLoaded', function() {
+    // Обновляем счетчик при клике
+    const checkboxes = document.querySelectorAll('input[type="checkbox"].action-select');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectionCounter);
+    });
+
+    // Добавляем стили для выделенных строк
+    const style = document.createElement('style');
+    style.textContent = `
+        .selected-row { background-color: #fff3cd !important; }
+        input.action-select:checked { accent-color: #dc3545; }
+    `;
+    document.head.appendChild(style);
+
+    // Обработка кликов по строкам
+    const rows = document.querySelectorAll('#result_list tr');
+    rows.forEach(row => {
+        row.addEventListener('click', function(e) {
+            if (!e.target.matches('input, a')) {
+                const checkbox = this.querySelector('input.action-select');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change'));
+                    this.classList.toggle('selected-row', checkbox.checked);
+                }
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #changelist table thead th:first-child {
+        width: 40px;
+    }
+
+    .object-tools {
+        display: flex;
+        gap: 10px;
+    }
+
+        .object-tools li {
+            list-style: none;
+            margin: 0;
+        }
+</style>
+{% endblock %}
+
+{% block object-tools-items %}
+<li>
+    <a href="{% url 'feedback_list' %}" target="_blank"
+       style="background-color: #8B0000; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none;">
+        🌐 Все отзывы
+    </a>
+</li>
+<li>
+    <button type="button" onclick="deleteSelectedFeedbacks()"
+            style="background-color: #dc3545; color: white; padding: 8px 12px; border-radius: 4px; border: none; cursor: pointer;">
+        🗑️ Удалить выбранные
+    </button>
+</li>
+{{ block.super }}
+{% endblock %}

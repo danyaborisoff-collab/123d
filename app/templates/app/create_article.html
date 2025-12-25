@@ -1,0 +1,170 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}{{ title }} - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Ошибка!</strong> Пожалуйста, исправьте ошибки ниже.
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">{{ form.title.label }} *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <div class="text-danger">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.short_content.id_for_label }}">{{ form.short_content.label }} *</label>
+                    {{ form.short_content }}
+                    <small class="form-text text-muted">Максимум 500 символов</small>
+                    {% if form.short_content.errors %}
+                    <div class="text-danger">{{ form.short_content.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.full_content.id_for_label }}">{{ form.full_content.label }} *</label>
+                    {{ form.full_content }}
+                    {% if form.full_content.errors %}
+                    <div class="text-danger">{{ form.full_content.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- === НОВОЕ ПОЛЕ ДЛЯ ИЗОБРАЖЕНИЯ === -->
+                <div class="form-group">
+                    <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                    <div class="custom-file">
+                        {{ form.image }}
+                        <label class="custom-file-label" for="{{ form.image.id_for_label }}">
+                            {% if article and article.image %}
+                            Текущее: {{ article.image.name|slice:"12:" }}
+                            {% else %}
+                            Выберите файл...
+                            {% endif %}
+                        </label>
+                    </div>
+                    <small class="form-text text-muted">
+                        Рекомендуемый размер: 1200×600 пикселей. Поддерживаемые форматы: JPG, PNG, GIF.
+                    </small>
+                    {% if form.image.errors %}
+                    <div class="text-danger">{{ form.image.errors }}</div>
+                    {% endif %}
+
+                    {% if article and article.image %}
+                    <div class="mt-2">
+                        <p><strong>Текущее изображение:</strong></p>
+                        <img src="{{ article.image.url }}"
+                             alt="{{ article.title }}"
+                             class="img-thumbnail"
+                             style="max-width: 300px;">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.published_date.id_for_label }}">{{ form.published_date.label }}</label>
+                    {{ form.published_date }}
+                    {% if form.published_date.errors %}
+                    <div class="text-danger">{{ form.published_date.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        {% if article %}Сохранить изменения{% else %}Создать статью{% endif %}
+                    </button>
+                    <a href="{% if article %}{% url 'blog_article_detail' article.id %}{% else %}{% url 'blog_list' %}{% endif %}"
+                       class="btn btn-secondary">
+                        Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📝 Подсказки</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Заполните все поля, отмеченные *</li>
+                        <li>Краткое содержание отображается в списке статей</li>
+                        <li>Полное содержание показывается на странице статьи</li>
+                        <li>Изображение улучшит восприятие статьи</li>
+                        <li>Дата публикации определяет порядок отображения</li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if article %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>⚙️ Действия</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'blog_article_detail' article.id %}"
+                       class="btn btn-info btn-block mb-2">
+                        👁️ Посмотреть статью
+                    </a>
+                    <a href="{% url 'delete_article' article.id %}"
+                       class="btn btn-danger btn-block"
+                       onclick="return confirm('Удалить статью?')">
+                        🗑️ Удалить статью
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-file-label::after {
+        content: "Обзор";
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control, .custom-file-input {
+        background-color: #222;
+        border: 1px solid #444;
+        color: white;
+    }
+
+        .form-control:focus {
+            background-color: #333;
+            border-color: #8B0000;
+            color: white;
+        }
+
+    .custom-file-label {
+        background-color: #222;
+        border: 1px solid #444;
+        color: #aaa;
+    }
+</style>
+
+<script>
+    // Показываем имя выбранного файла
+    document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+        var fileName = document.getElementById("{{ form.image.id_for_label }}").files[0].name;
+        var nextSibling = e.target.nextElementSibling;
+        nextSibling.innerText = fileName;
+    });
+</script>
+{% endblock %}

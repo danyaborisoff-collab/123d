@@ -1,0 +1,157 @@
+﻿{% extends "app/layout.html" %}
+
+{% block title %}Блог - Avec Plaisir{% endblock %}
+
+{% block content %}
+<div class="blog-container">
+    <h1 class="blog-title">📰 Блог о сувенирах и подарках</h1>
+    <p class="blog-description">Интересные статьи об искусстве дарения, выборе сувениров и культуре подарков</p>
+
+    {% if articles %}
+    <div class="articles-grid">
+        {% for article in articles %}
+        <div class="article-card">
+            <div class="article-header">
+                <h2 class="article-title">{{ article.title }}</h2>
+                <div class="article-meta">
+                    <span class="article-date">📅 {{ article.published_date|date:"d.m.Y" }}</span>
+                    <span class="article-time">{{ article.published_date|date:"H:i" }}</span>
+                </div>
+            </div>
+
+            <div class="article-excerpt">
+                <p>{{ article.short_content }}</p>
+            </div>
+
+            <div class="article-footer">
+                <a href="{% url 'blog_article_detail' article.id %}" class="read-more-btn">
+                    📖 Читать далее →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-articles">
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>Статей пока нет</h3>
+            <p>Скоро здесь появятся интересные материалы о сувенирах!</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ТОЛЬКО ОДНА КНОПКА (исправлено) -->
+    {% if user.is_staff or user.is_superuser %}
+    <div class="text-center mt-4">
+        <a href="{% url 'create_article' %}" class="btn btn-primary btn-lg">
+            ➕ Добавить новую статью
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Стили для блога */
+    .blog-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .blog-title {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #8B0000 !important;
+    }
+
+    .blog-description {
+        text-align: center;
+        color: #aaa;
+        margin-bottom: 40px;
+        font-size: 1.1em;
+    }
+
+    .articles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .article-card {
+        background: #222;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #333;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(139, 0, 0, 0.2);
+            border-color: #8B0000;
+        }
+
+    .article-header {
+        margin-bottom: 20px;
+    }
+
+    .article-title {
+        color: #8B0000 !important;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .article-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .article-excerpt {
+        color: #ccc;
+        line-height: 1.6;
+        margin-bottom: 25px;
+        font-size: 1.05em;
+    }
+
+    .read-more-btn {
+        display: inline-block;
+        background: linear-gradient(45deg, #8B0000, #A52A2A);
+        color: white !important;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        .read-more-btn:hover {
+            background: linear-gradient(45deg, #A52A2A, #8B0000);
+            transform: translateX(5px);
+            text-decoration: none;
+            color: white !important;
+        }
+
+    .no-articles {
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .empty-state {
+        background: #222;
+        padding: 40px;
+        border-radius: 10px;
+        border: 2px dashed #444;
+    }
+
+    .empty-icon {
+        font-size: 3em;
+        margin-bottom: 20px;
+        color: #8B0000;
+    }
+</style>
+{% endblock %}
